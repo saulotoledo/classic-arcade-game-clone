@@ -1,46 +1,113 @@
-// Enemies our player must avoid
-var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+// RequireJS configuration:
+requirejs.config({
+    baseUrl: 'js/modules'
+});
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-};
+// Start the main app:
+requirejs(['engine'], function (Engine) {
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-};
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
-
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-
-
-
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
+    /**
+     * Return a random integer between min and max values.
+     *
+     * @param {number} min - The min value.
+     * @param {number} max - The max value.
+     */
+    Math.randomInt = function (min, max) {
+        return this.floor(this.random() * (max - min + 1) + min);
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    /**
+     * Remove an element from the array.
+     *
+     * @author By John Resig <jeresig@gmail.com>
+     * @license MIT
+     * @see http://ejohn.org/blog/javascript-array-remove/
+     * @param {number} from The starting element.
+     * @param {number} to The end element.
+     * @returns The result for apply.
+     */
+    Array.prototype.remove = function (from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+
+    /**
+     * Shuffles the current array.
+     *
+     * @returns The current array.
+     */
+    Array.prototype.shuffle = function () {
+        var currentIndex = this.length,
+            temporaryValue,
+            randomIndex;
+
+        while (0 !== currentIndex) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+            temporaryValue = this[currentIndex];
+            this[currentIndex] = this[randomIndex];
+            this[randomIndex] = temporaryValue;
+        }
+
+        return this;
+    };
+
+    // Some browsers already support the fill() method. We use
+    // a polyfill if it is not supported:
+    if (!Array.prototype.fill) {
+
+        /**
+         * Polyfill for the ES6 Array.fill(). It fills all the elements
+         * of the current array from a start index to an end index
+         * with a static value.
+         *
+         * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/fill
+         * @param {any} value 
+         * @returns 
+         */
+        Array.prototype.fill = function (value) {
+
+            // Steps 1-2.
+            if (this === null) {
+                throw new TypeError('this is null or not defined');
+            }
+
+            var O = Object(this);
+
+            // Steps 3-5.
+            var len = O.length >>> 0;
+
+            // Steps 6-7.
+            var start = arguments[1];
+            var relativeStart = start >> 0;
+
+            // Step 8.
+            var k = relativeStart < 0 ?
+                Math.max(len + relativeStart, 0) :
+                Math.min(relativeStart, len);
+
+            // Steps 9-10.
+            var end = arguments[2];
+            var relativeEnd = end === undefined ?
+                len : end >> 0;
+
+            // Step 11.
+            var final = relativeEnd < 0 ?
+                Math.max(len + relativeEnd, 0) :
+                Math.min(relativeEnd, len);
+
+            // Step 12.
+            while (k < final) {
+                O[k] = value;
+                k++;
+            }
+
+            // Step 13.
+            return O;
+        };
+    }
+
+    // Starts the engine:
+    Engine(window);
 });

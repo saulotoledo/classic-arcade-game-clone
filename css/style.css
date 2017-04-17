@@ -1,3 +1,29 @@
+@font-face {
+    font-family: "PressStart2P";
+    src: url("../fonts/PressStart2P-Regular.ttf");
+}
+
+@font-face {
+    font-family: "PerfectDark";
+    src: url("../fonts/pdark.ttf");
+}
+
+@font-face {
+    font-family: "Alagard";
+    src: url("../fonts/alagard.ttf");
+}
+
+@font-face {
+    font-family: "AlphaWizard";
+    src: url("../fonts/AlphaWizard.ttf");
+}
+
+@font-face {
+    font-family: "BadaBoomBB";
+    src: url("../fonts/BADABB__.ttf");
+}
+
 body {
     text-align: center;
+    background-color: #000;
 }
