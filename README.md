@@ -57,5 +57,5 @@ This game is fully implemented in client-side JavaScript, so you just need a bro
 ## Copyright information
 
 - **Source code (except `require.js`, `engine.js` and `resources.js`)**: [MIT License](LICENSE.md) - Copyright (c) 2017 Saulo S. Toledo;
-- **`require.js**: Check in [their website](http://requirejs.org/) or [here](https://github.com/requirejs/requirejs/blob/master/LICENSE);
+- **`require.js`**: Check in [their website](http://requirejs.org/) or [here](https://github.com/requirejs/requirejs/blob/master/LICENSE);
 - **Game assets, `engine.js` and `resources.js`**: Please check each author's distribution license.

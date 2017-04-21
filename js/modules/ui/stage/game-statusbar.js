@@ -23,6 +23,13 @@ define(['config/config', 'config/strings'], function (config, strings) {
          */
         this.stage = gameStage;
 
+        // TODO: remove the "this.soundIsPrepared" property, it should not be necessary.
+        /**
+         * Identifies whether the sound behavior has already prepared
+         * in order to avoid a repeated record in each drawing event.
+         */
+        this.soundIsPrepared = false;
+
         var self = this;
 
         /**
@@ -52,6 +59,10 @@ define(['config/config', 'config/strings'], function (config, strings) {
         } else if (document.detachEvent) { // For IE 8 and earlier versions
             this.stage.canvas.detachEvent("onmouseup", this.mouseUpListener);
         }
+    };
+
+    GameUIStatusBar.prototype.close = function () {
+
     };
 
     /**
@@ -85,22 +96,33 @@ define(['config/config', 'config/strings'], function (config, strings) {
 
         this.stage.ctx.drawImage(Resources.get(soundImage), soundIconBounds.topLeftX, soundIconBounds.topLeftY, soundIconWidth, soundIconHeight);
 
-        /* Adding the hover event to mute/unmute the sound. The current action
-         * to be used in the mouse down event is only available when the mouse
-         * is over the mute/unmute icon.
-         * */
-        this.stage.addHoverBoundActions(
-            'sound',
-            soundIconBounds,
-            function (key) {
-                self.stage.currentAction = function () {
-                    self.stage.toggleAudio();
-                };
-            },
-            function (key) {
-                self.stage.currentAction = null;
-            }
-        );
+        if (!this.soundIsPrepared) {
+            /* Adding the hover event to mute/unmute the sound. The current action
+             * to be used in the mouse down event is only available when the mouse
+             * is over the mute/unmute icon.
+             * */
+            this.stage.addHoverElements(
+                'sound',
+                soundIconBounds,
+                // We need to draw the image resized, but this is not supported here,
+                // so we draw the image in the update function and use an empty
+                // function here. This behavior needs refactoring.
+                // TODO: fix the behavior above.
+                function () {},
+                soundIconBounds.topLeftX,
+                soundIconBounds.topLeftY,
+                function (key) {
+                    self.stage.currentAction = function () {
+                        self.stage.toggleAudio();
+                    };
+                },
+                function (key) {
+                    self.stage.currentAction = null;
+                }
+            );
+
+            this.soundIsPrepared = true;
+        }
 
         // Drawing the player score and the current level:
         this.stage.drawDetachedText(

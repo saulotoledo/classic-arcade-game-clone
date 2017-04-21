@@ -60,6 +60,9 @@ define(['config/config', 'config/strings', 'ui/stage', 'ui/stage/intro-menu'], f
 
         // Render the game help:
         this.renderHelp(strings.introHelp);
+
+        // Run the super class init method:
+        StageUI.prototype.init.call(this);
     };
 
     /**

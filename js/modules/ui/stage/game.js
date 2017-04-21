@@ -595,6 +595,9 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
         if (this.game.isPaused) {
             this.renderPauseInfo();
         }
+
+        // Run the super class init method:
+        StageUI.prototype.init.call(this);
     };
 
     return GameUI;

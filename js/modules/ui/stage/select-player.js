@@ -82,6 +82,8 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         document.addEventListener('keyup', this.keyUpEvent);
 
         this.canvas.addEventListener('mouseup', this.mouseUpListener);
+
+        this.prepareHoverables();
     };
 
     SelectPlayerUI.prototype = Object.create(StageUI.prototype);
@@ -96,6 +98,39 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         } else if (document.detachEvent) { // For IE 8 and earlier versions
             document.detachEvent("onkeyup", this.keyUpEvent);
             this.canvas.detachEvent("onmouseup", this.mouseUpListener);
+        }
+    };
+
+    SelectPlayerUI.prototype.prepareHoverables = function () {
+
+        var xPos = config.GENERAL_TILE_WIDTH,
+            yPos = 2 * config.GENERAL_TITLE_TOP_Y_POS,
+            mouseOverCallback = function (itemIndex) {
+                self.selectedIndex = itemIndex;
+            },
+            mouseOutCallback = function (itemIndex) {},
+            self = this;
+
+
+        for (var i = 0; i < this.playerImages.length; i++) {
+            var totalXPos = (i + 1) * xPos;
+
+            var itemBounds = {
+                topLeftX: totalXPos,
+                topLeftY: yPos,
+                bottomRightX: totalXPos + config.GENERAL_TILE_WIDTH,
+                bottomRightY: yPos + config.GENERAL_TILE_HEIGHT * 2
+            };
+
+            this.addHoverElements(
+                i,
+                itemBounds,
+                this.playerImages[i],
+                totalXPos,
+                yPos,
+                mouseOverCallback,
+                mouseOutCallback
+            );
         }
     };
 
@@ -125,34 +160,14 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         );
 
         var xPos = config.GENERAL_TILE_WIDTH,
-            yPos = 2 * config.GENERAL_TITLE_TOP_Y_POS,
-            mouseOverCallback = function (itemIndex) {
-                self.selectedIndex = itemIndex;
-            },
-            mouseOutCallback = function (itemIndex) {},
-            self = this;
+            yPos = 2 * config.GENERAL_TITLE_TOP_Y_POS;
 
         this.ctx.drawImage(Resources.get('images/selector.png'), (this.selectedIndex + 1) * xPos, yPos);
-        for (var i = 0; i < this.playerImages.length; i++) {
-            var totalXPos = (i + 1) * xPos;
-            this.ctx.drawImage(Resources.get(this.playerImages[i]), totalXPos, yPos);
-
-            var itemBounds = {
-                topLeftX: totalXPos,
-                topLeftY: yPos,
-                bottomRightX: totalXPos + config.GENERAL_TILE_WIDTH,
-                bottomRightY: yPos + config.GENERAL_TILE_HEIGHT * 2
-            };
-
-            this.addHoverBoundActions(
-                i,
-                itemBounds,
-                mouseOverCallback,
-                mouseOutCallback
-            );
-        }
 
         this.renderHelp(strings.selectPlayerHelp);
+
+        // Run the super class init method:
+        StageUI.prototype.init.call(this);
     };
 
     return SelectPlayerUI;

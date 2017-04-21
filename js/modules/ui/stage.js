@@ -37,64 +37,142 @@ define(['config/config', 'config/strings'], function (config, strings) {
          */
         this.game = game;
 
-        this.hoverBoundActions = [];
+        /**
+         * Define an object that contains the coordinates used to verify
+         * collisions.
+         *
+         * @typedef {object} bounds
+         * @property {number} topLeftX The top left x position.
+         * @property {number} bottomRightX The bottom right x position.
+         * @property {number} topLeftY The top left y position.
+         * @property {number} bottomRightY The bottom right y position.
+         */
 
-        // Identify the elements the mouse is over.
+        /**
+         * This callback is used to handle mouse over events.
+         * 
+         * @callback mouseOverCallbackType
+         * @param {identifier} identifier The name (identifier) of the hover area (see {@link hoverElement}).
+         */
+
+        /**
+         * This callback is used to handle mouse out events.
+         * 
+         * @callback mouseOutCallbackType
+         * @param {identifier} identifier The identifier of the hover area (see {@link hoverElement}).
+         */
+
+        /**
+         * Define an object that contains the data used to identify the mouse hover
+         * areas in the stage.
+         *
+         * @typedef {object} hoverElement
+         * @property {string} identifier An identifier for that hover area.
+         * @property {bounds} bounds The hover bounds.
+         * @property {string|function} content The image path a function that renders the element.
+         * @property {number} renderXPos The x position to render the element.
+         * @property {number} renderYPos The y position to render the element.
+         * @property {mouseOverCallbackType} mouseOverCallback
+         * @property {mouseOutCallbackType} mouseOutCallback
+         */
+
+        /**
+         * An array of {@link hoverElement} objects.
+         *
+         * @type {hoverElement[]}
+         */
+        this.hoverElements = [];
+
+        /**
+         * Identify the elements the mouse is over. Each value must contain the identifier
+         * found at {@link StageUI#hoverElements}.
+         * 
+         * @type {string[]}
+         */
         this.mouseOverElements = [];
 
-        //this.mouseMoveCallbacks = {};
-
+        /**
+         * Identify if the mouse left button is pressed.
+         * 
+         * @type {boolean}
+         */
         this.mouseIsPressed = false;
+
+        /**
+         * Identify if the enter key is pressed.
+         * 
+         * @type {boolean}
+         */
         this.enterIsPressed = false;
 
         var self = this;
+
+        /**
+         * A listener that should be used in the mousemove event to update
+         * the mouse cursor in hover areas, and handle the hover areas,
+         * updating the proper variables.
+         * 
+         * @param {MouseEvent} evt The mouse event.
+         */
         this.mouseMoveListener = function (evt) {
+            var mousePos = self.getMousePos(evt);
 
-            var mousePos = self.getMousePos(evt),
-                previousActionName;
-
+            // Updating the mouse cursor on hover areas:
             if (self.mouseOverElements.length > 0) {
                 self.canvas.style.cursor = "pointer";
             } else {
                 self.canvas.style.cursor = "initial";
             }
 
-            self.hoverBoundActions.forEach(function (hoverBoundAction) {
-                var bounds = hoverBoundAction.bounds;
+            // Check if the mouse is in a hover area:
+            self.hoverElements.forEach(function (hoverElement) {
+                var bounds = hoverElement.bounds;
 
+                // Check if the mouse is inside the hover area bounds:
                 if (mousePos.x >= bounds.topLeftX &&
                     mousePos.x <= bounds.bottomRightX &&
                     mousePos.y >= bounds.topLeftY &&
                     mousePos.y <= bounds.bottomRightY) {
 
-                    if (self.mouseOverElements.indexOf(hoverBoundAction.name) == -1) {
+                    // If the hover area is not registered in the {@link StageUI#mouseOverElements}
+                    // list, i.e. this hover has not happened yet, play a "selection change" sound
+                    // and register the hover event:
+                    if (self.mouseOverElements.indexOf(hoverElement.identifier) === -1) {
                         self.game.audioControl.playSound('selectionChange');
-                        self.mouseOverElements.push(hoverBoundAction.name);
+                        self.mouseOverElements.push(hoverElement.identifier);
                     }
-                    hoverBoundAction.mouseOverCallback(hoverBoundAction.name);
+
+                    // Trigger the equivalent mouseover event:
+                    hoverElement.mouseOverCallback(hoverElement.identifier);
                 } else {
-                    var index = self.mouseOverElements.indexOf(hoverBoundAction.name);
+                    // If the mouse is not above a hover area, it should be removed from the
+                    // {@link StageUI#mouseOverElements} list:
+                    var index = self.mouseOverElements.indexOf(hoverElement.identifier);
                     if (index > -1) {
                         self.mouseOverElements.splice(index, 1);
                     }
-                    hoverBoundAction.mouseOutCallback(hoverBoundAction.name);
-                }
 
-                previousActionName = hoverBoundAction.name;
+                    // Trigger the equivalent mouseout event:
+                    hoverElement.mouseOutCallback(hoverElement.identifier);
+                }
             });
         };
 
+        // Registering the mousemove event:
         this.canvas.addEventListener('mousemove', this.mouseMoveListener);
-        this.canvas.dispatchEvent(new MouseEvent('mousemove'));
 
+        // Registering the mousedown event to identify when the mouse is pressed:
         this.canvas.addEventListener('mousedown', function (evt) {
             self.mouseIsPressed = true;
         });
 
+        // Registering the mousedown event to identify when the mouse is not pressed:
         this.canvas.addEventListener('mouseup', function (evt) {
             self.mouseIsPressed = false;
         });
 
+        // Registering the keydown event to identify when the supported keys and when
+        // the enter key is pressed:
         document.addEventListener('keydown', function (evt) {
             var allowedKeys = {
                     13: 'enter',
@@ -110,6 +188,7 @@ define(['config/config', 'config/strings'], function (config, strings) {
             }
         });
 
+        // Registering the keydown event to identify when the enter key is not pressed:
         document.addEventListener('keyup', function (evt) {
             if (evt.keyCode === 13) { //enter
                 self.enterIsPressed = false;
@@ -117,18 +196,51 @@ define(['config/config', 'config/strings'], function (config, strings) {
         });
     };
 
+    StageUI.prototype.init = function () {
+        // Render the hoverables:
+        this.renderHoverables();
+    };
+
     StageUI.prototype.close = function () {
-        this.hoverBoundActions = [];
+        this.hoverElements = [];
+
+        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
+            document.removeEventListener('keyup', this.keyUpEvent);
+            document.removeEventListener('keydown', this.keyDownEvent);
+            this.canvas.removeEventListener('mouseup', this.mouseUpListener);
+            this.canvas.removeEventListener('mousedown', this.mousDownListener);
+            this.canvas.removeEventListener('mousemove', this.mouseMoveListener);
+        } else if (document.detachEvent) { // For IE 8 and earlier versions
+            document.detachEvent("onkeyup", this.keyUpEvent);
+            document.detachEvent("onkeydown", this.keyDownEvent);
+            this.canvas.detachEvent("onmmouseup", this.mouseUpListener);
+            this.canvas.detachEvent("onmousedown", this.mousDownListener);
+            this.canvas.detachEvent("onmousemove", this.mouseMoveListener);
+        }
     };
 
     StageUI.prototype.toggleAudio = function () {
         this.game.isMute = !this.game.isMute;
     };
 
-    StageUI.prototype.addHoverBoundActions = function (name, bounds, mouseOverCallback, mouseOutCallback) {
-        this.hoverBoundActions.push({
-            name: name,
+    StageUI.prototype.renderHoverables = function () {
+        var self = this;
+        this.hoverElements.forEach(function (element) {
+            if (typeof element.content === 'function') {
+                element.content(element);
+            } else {
+                self.ctx.drawImage(Resources.get(element.content), element.renderXPos, element.renderYPos);
+            }
+        });
+    };
+
+    StageUI.prototype.addHoverElements = function (identifier, bounds, content, renderXPos, renderYPos, mouseOverCallback, mouseOutCallback) {
+        this.hoverElements.push({
+            identifier: identifier,
             bounds: bounds,
+            content: content,
+            renderXPos: renderXPos,
+            renderYPos: renderYPos,
             mouseOverCallback: mouseOverCallback,
             mouseOutCallback: mouseOutCallback
         });

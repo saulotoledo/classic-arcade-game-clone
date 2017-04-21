@@ -27,7 +27,7 @@ define(['config/config', 'config/strings'], function (config, strings) {
         /**
          * A menu item.
          *
-         * @typedef {Object} menuitem
+         * @typedef {object} menuitem
          * @property {boolean} selected - Indicates whether the menu item is selected.
          * @property {function} action - The action to run of the menu is used.
          */
@@ -112,6 +112,91 @@ define(['config/config', 'config/strings'], function (config, strings) {
         document.addEventListener('keyup', this.keyUpEvent);
 
         this.stage.canvas.addEventListener('mouseup', this.mouseUpListener);
+        this.prepareMenuHoverActions();
+    };
+
+    IntroUIMenu.prototype.getMenuPos = function () {
+        var menuPos = {
+            x: this.stage.canvas.width / 2 - config.INIT_SCREEN_MENU_WIDTH / 2,
+            y: this.stage.canvas.height / 2 + config.INIT_SCREEN_MENU_ITEM_HEIGHT,
+            width: config.INIT_SCREEN_MENU_WIDTH,
+            height: config.INIT_SCREEN_MENU_HEIGHT
+        };
+
+        return menuPos;
+    };
+
+    IntroUIMenu.prototype.drawMenuItem = function (menuItemKey, x, y) {
+
+        var menuItem = this.menuItems[menuItemKey],
+            canvas = this.stage.canvas,
+            ctx = this.stage.ctx,
+            color = 'white',
+            pressed = false,
+            textValue = strings[menuItemKey],
+            textFont = config.INIT_SCREEN_MENU_FONT;
+
+        if (menuItem.selected) {
+            color = 'yellow';
+            if (
+                (this.stage.mouseIsPressed && this.stage.mouseOverElements.indexOf(menuItemKey) > -1) ||
+                this.stage.enterIsPressed) {
+
+                color = 'coral';
+                pressed = true;
+            }
+        }
+
+        ctx.font = config.INIT_SCREEN_MENU_FONT;
+        ctx.textAlign = 'center';
+
+        this.stage.drawDetachedText(
+            textValue,
+            textFont,
+            'center',
+            'black',
+            color,
+            x,
+            y,
+            pressed
+        );
+    };
+
+    IntroUIMenu.prototype.prepareMenuHoverActions = function () {
+        var self = this,
+            menuPos = this.getMenuPos(),
+            menuItemTop = self.getNextMenuItemTop(),
+            menuItemMouseOver = function (menuItemKey) {
+                self.setMenuItemSelectionStatus(menuItemKey, true);
+            },
+            menuItemMouseOut = function (menuItemKey) {},
+            hoverElementDrawFunction = function (hoverElement) {
+                self.drawMenuItem(hoverElement.identifier, hoverElement.renderXPos, hoverElement.renderYPos);
+            };
+
+        Object.keys(this.menuItems).forEach(function (menuItemKey) {
+            self.stage.ctx.font = config.INIT_SCREEN_MENU_FONT;
+            var textValue = strings[menuItemKey],
+                textWidth = self.stage.ctx.measureText(textValue).width,
+                menuItemBounds = {
+                    topLeftX: self.stage.canvas.width / 2 - textWidth / 2,
+                    topLeftY: menuPos.y + menuItemTop - config.INIT_SCREEN_MENU_ITEM_HEIGHT,
+                    bottomRightX: self.stage.canvas.width / 2 + textWidth / 2 + config.GENERAL_TEXT_SHADOW_DIFF_X,
+                    bottomRightY: menuPos.y + menuItemTop + config.GENERAL_TEXT_SHADOW_DIFF_Y
+                };
+
+            self.stage.addHoverElements(
+                menuItemKey,
+                menuItemBounds,
+                hoverElementDrawFunction,
+                self.stage.canvas.width / 2,
+                menuPos.y + menuItemTop,
+                menuItemMouseOver,
+                menuItemMouseOut
+            );
+
+            menuItemTop = self.getNextMenuItemTop(menuItemTop);
+        });
     };
 
     IntroUIMenu.prototype.runCurrentAction = function () {
@@ -150,76 +235,21 @@ define(['config/config', 'config/strings'], function (config, strings) {
         });
     };
 
+    IntroUIMenu.prototype.getNextMenuItemTop = function (previousMenuItemTop) {
+        var menuItemTopMargin = 45,
+            textHeight = config.INIT_SCREEN_MENU_ITEM_HEIGHT;
+
+        if (!previousMenuItemTop) {
+            return menuItemTopMargin;
+        }
+
+        return previousMenuItemTop + textHeight + menuItemTopMargin / 2;
+    };
+
     IntroUIMenu.prototype.update = function () {
-
-        var self = this,
-            canvas = self.stage.canvas,
-            ctx = self.stage.ctx,
-            menuPos = {
-                x: canvas.width / 2 - config.INIT_SCREEN_MENU_WIDTH / 2,
-                y: canvas.height / 2 + config.INIT_SCREEN_MENU_ITEM_HEIGHT,
-                width: config.INIT_SCREEN_MENU_WIDTH,
-                height: config.INIT_SCREEN_MENU_HEIGHT
-            },
-            menuItemTopMargin = 45,
-            menuItemTop = menuItemTopMargin,
-            menuItems = ['menuNewGame', 'menuCredits'];
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.fillRect(menuPos.x, menuPos.y, menuPos.width, menuPos.height);
-
-        Object.keys(this.menuItems).forEach(function (menuItemKey) {
-            var menuItem = self.menuItems[menuItemKey],
-                color = 'white',
-                pressed = false,
-                textValue = strings[menuItemKey],
-                textFont = config.INIT_SCREEN_MENU_FONT;
-
-            if (menuItem.selected) {
-                color = 'yellow';
-                if (
-                    (self.stage.mouseIsPressed && self.stage.mouseOverElements.indexOf(menuItemKey) > -1) ||
-                    self.stage.enterIsPressed) {
-
-                    color = 'coral';
-                    pressed = true;
-                }
-            }
-
-            ctx.font = config.INIT_SCREEN_MENU_FONT;
-            ctx.textAlign = 'center';
-            var textWidth = ctx.measureText(textValue).width;
-            var textHeight = config.INIT_SCREEN_MENU_ITEM_HEIGHT;
-
-            var menuItemBounds = {
-                topLeftX: canvas.width / 2 - textWidth / 2,
-                topLeftY: menuPos.y + menuItemTop - textHeight,
-                bottomRightX: canvas.width / 2 + textWidth / 2 + config.GENERAL_TEXT_SHADOW_DIFF_X,
-                bottomRightY: menuPos.y + menuItemTop + config.GENERAL_TEXT_SHADOW_DIFF_Y
-            };
-
-            self.stage.addHoverBoundActions(
-                menuItemKey,
-                menuItemBounds,
-                function (menuItemKey) {
-                    self.setMenuItemSelectionStatus(menuItemKey, true);
-                },
-                function (menuItemKey) {}
-            );
-
-            self.stage.drawDetachedText(
-                textValue,
-                textFont,
-                'center',
-                'black',
-                color,
-                canvas.width / 2,
-                menuPos.y + menuItemTop,
-                pressed
-            );
-
-            menuItemTop += textHeight + menuItemTopMargin / 2;
-        });
+        var menuPos = this.getMenuPos();
+        this.stage.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.stage.ctx.fillRect(menuPos.x, menuPos.y, menuPos.width, menuPos.height);
     };
 
     return IntroUIMenu;
