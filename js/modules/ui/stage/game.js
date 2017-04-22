@@ -98,9 +98,13 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
 
         var self = this;
 
-        // This listens for key presses and sends the keys to your
-        // Player.handleInput() method.
-        this.keyUpEvent = document.addEventListener('keyup', function (e) {
+        /**
+         * A function to be used in the keyup event and listens for key
+         * presses and sends the keys to your Player.handleInput() method.
+         * 
+         * @type {function}
+         */
+        this.keyUpEventListener = function (e) {
             var allowedKeys = {
                 37: 'left',
                 38: 'up',
@@ -112,14 +116,14 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
 
             var key = allowedKeys[e.keyCode];
 
-            console.log(key);
-
             if (key === 'P' || key === 'p') {
                 self.togglePause();
             } else if (!self.game.isPaused && self.isValidMove(key)) {
                 self.player.handleInput(allowedKeys[e.keyCode]);
             }
-        });
+        }
+
+        document.addEventListener('keyup', this.keyUpEventListener);
 
         // An interval to ramdomly create collectibles.
         this.collectiblesCreatorInterval = setInterval(function () {
@@ -323,10 +327,10 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
         clearInterval(this.collectiblesCreatorInterval);
 
         if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            document.removeEventListener('keyup', this.keyUpEvent);
+            document.removeEventListener('keyup', this.keyUpEventListener);
             this.canvas.removeEventListener('mousedown', this.mouseDownListener);
         } else if (document.detachEvent) { // For IE 8 and earlier versions
-            document.detachEvent("onkeyup", this.keyUpEvent);
+            document.detachEvent("onkeyup", this.keyUpEventListener);
             this.canvas.detachEvent("onmousedown", this.mouseDownListener);
         }
     };
