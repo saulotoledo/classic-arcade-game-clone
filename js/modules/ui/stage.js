@@ -3,7 +3,7 @@
  *
  * @module ui/stage
  */
-define(['config/config', 'config/strings'], function (config, strings) {
+define(['config/config', 'config/strings', 'misc/point'], function (config, strings, Point) {
 
     /**
      * Creates the main stage UI. It nust be extended by the other game UIs.
@@ -52,40 +52,40 @@ define(['config/config', 'config/strings'], function (config, strings) {
          * This callback is used to handle mouse over events.
          * 
          * @callback mouseOverCallbackType
-         * @param {identifier} identifier The name (identifier) of the hover area (see {@link hoverElement}).
+         * @param {identifier} identifier The name (identifier) of the hover area (see {@link hoverable}).
          */
 
         /**
          * This callback is used to handle mouse out events.
          * 
          * @callback mouseOutCallbackType
-         * @param {identifier} identifier The identifier of the hover area (see {@link hoverElement}).
+         * @param {identifier} identifier The identifier of the hover area (see {@link hoverable}).
          */
 
         /**
          * Define an object that contains the data used to identify the mouse hover
          * areas in the stage.
          *
-         * @typedef {object} hoverElement
+         * @typedef {object} hoverable
          * @property {string} identifier An identifier for that hover area.
          * @property {bounds} bounds The hover bounds.
          * @property {string|function} content The image path a function that renders the element.
          * @property {number} renderXPos The x position to render the element.
          * @property {number} renderYPos The y position to render the element.
-         * @property {mouseOverCallbackType} mouseOverCallback
-         * @property {mouseOutCallbackType} mouseOutCallback
+         * @property {mouseOverCallbackType} mouseOverCallback A callback to run when the mouse is over.
+         * @property {mouseOutCallbackType} mouseOutCallback A callback to run when the mouse is out.
          */
 
         /**
-         * An array of {@link hoverElement} objects.
+         * An array of {@link hoverable} objects.
          *
-         * @type {hoverElement[]}
+         * @type {hoverable[]}
          */
-        this.hoverElements = [];
+        this.hoverables = [];
 
         /**
          * Identify the elements the mouse is over. Each value must contain the identifier
-         * found at {@link StageUI#hoverElements}.
+         * found at {@link StageUI#hoverables}.
          * 
          * @type {string[]}
          */
@@ -125,8 +125,8 @@ define(['config/config', 'config/strings'], function (config, strings) {
             }
 
             // Check if the mouse is in a hover area:
-            self.hoverElements.forEach(function (hoverElement) {
-                var bounds = hoverElement.bounds;
+            self.hoverables.forEach(function (hoverable) {
+                var bounds = hoverable.bounds;
 
                 // Check if the mouse is inside the hover area bounds:
                 if (mousePos.x >= bounds.topLeftX &&
@@ -137,23 +137,23 @@ define(['config/config', 'config/strings'], function (config, strings) {
                     // If the hover area is not registered in the {@link StageUI#mouseOverElements}
                     // list, i.e. this hover has not happened yet, play a "selection change" sound
                     // and register the hover event:
-                    if (self.mouseOverElements.indexOf(hoverElement.identifier) === -1) {
+                    if (self.mouseOverElements.indexOf(hoverable.identifier) === -1) {
                         self.game.audioControl.playSound('selectionChange');
-                        self.mouseOverElements.push(hoverElement.identifier);
+                        self.mouseOverElements.push(hoverable.identifier);
                     }
 
                     // Trigger the equivalent mouseover event:
-                    hoverElement.mouseOverCallback(hoverElement.identifier);
+                    hoverable.mouseOverCallback(hoverable.identifier);
                 } else {
                     // If the mouse is not above a hover area, it should be removed from the
                     // {@link StageUI#mouseOverElements} list:
-                    var index = self.mouseOverElements.indexOf(hoverElement.identifier);
+                    var index = self.mouseOverElements.indexOf(hoverable.identifier);
                     if (index > -1) {
                         self.mouseOverElements.splice(index, 1);
                     }
 
                     // Trigger the equivalent mouseout event:
-                    hoverElement.mouseOutCallback(hoverElement.identifier);
+                    hoverable.mouseOutCallback(hoverable.identifier);
                 }
             });
         };
@@ -196,13 +196,21 @@ define(['config/config', 'config/strings'], function (config, strings) {
         });
     };
 
+    /**
+     * Initialize the stage.
+     */
     StageUI.prototype.init = function () {
         // Render the hoverables:
         this.renderHoverables();
     };
 
+    /**
+     * Callback to run when the stage is closed.
+     * It removes the event listeners created by the constructor and resets 
+     * the hover elements.
+     */
     StageUI.prototype.close = function () {
-        this.hoverElements = [];
+        this.hoverables = [];
 
         if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
             document.removeEventListener('keyup', this.keyUpEvent);
@@ -219,23 +227,44 @@ define(['config/config', 'config/strings'], function (config, strings) {
         }
     };
 
+    /**
+     * Toggle the audio stage.
+     */
     StageUI.prototype.toggleAudio = function () {
         this.game.isMute = !this.game.isMute;
     };
 
+    /**
+     * Render the elements that can receive a mouse hover in the game.
+     */
     StageUI.prototype.renderHoverables = function () {
         var self = this;
-        this.hoverElements.forEach(function (element) {
+        this.hoverables.forEach(function (element) {
             if (typeof element.content === 'function') {
+                // Some elements, such as text, need a number of particular settings
+                // that must be performed by a function and cannot be directly rendered
+                // as images:
                 element.content(element);
             } else {
+                // others are rendered as images in their original size:
                 self.ctx.drawImage(Resources.get(element.content), element.renderXPos, element.renderYPos);
             }
         });
     };
 
-    StageUI.prototype.addHoverElements = function (identifier, bounds, content, renderXPos, renderYPos, mouseOverCallback, mouseOutCallback) {
-        this.hoverElements.push({
+    /**
+     * Add a hoverable element to the stage.
+     * 
+     * @param {string} identifier An identifier for the hover area.
+     * @param {bounds} bounds The hover bounds.
+     * @param {string|function} content The image path a function that renders the element.
+     * @param {number} renderXPos The x position to render the element.
+     * @param {number} renderYPos The y position to render the element.
+     * @param {mouseOverCallbackType} mouseOverCallback A callback to run when the mouse is over.
+     * @param {mouseOutCallbackType} mouseOutCallback A callback to run when the mouse is out.
+     */
+    StageUI.prototype.addHoverable = function (identifier, bounds, content, renderXPos, renderYPos, mouseOverCallback, mouseOutCallback) {
+        this.hoverables.push({
             identifier: identifier,
             bounds: bounds,
             content: content,
@@ -246,6 +275,18 @@ define(['config/config', 'config/strings'], function (config, strings) {
         });
     };
 
+    /**
+     * Draw a text with a shadow, giving an impression of being detached from the stage.
+     * 
+     * @param {string} text The text to be drawn.
+     * @param {string} font The font of the text.
+     * @param {string} textAlign The text align in the canvas.
+     * @param {string} strokeStyle The stroke text style that will be applied in the canvas.
+     * @param {string} fillStyle The fill style of the text in the canvas.
+     * @param {number} posX The x position of the text in the canvas.
+     * @param {number} posY The y position of the text in the canvas.
+     * @param {boolean} pressed Informs if the text is pressed, i.e. closer to the shadow.
+     */
     StageUI.prototype.drawDetachedText = function (text, font, textAlign, strokeStyle, fillStyle, posX, posY, pressed) {
 
         if (typeof pressed === 'undefined') {
@@ -274,6 +315,9 @@ define(['config/config', 'config/strings'], function (config, strings) {
         this.ctx.closePath();
     };
 
+    /**
+     * Draw the background image defined in {@link StageUI#backgroundImage}.
+     */
     StageUI.prototype.drawBackground = function () {
         if (this.backgroundImage !== null) {
             var bgImage = Resources.get(this.backgroundImage);
@@ -286,12 +330,17 @@ define(['config/config', 'config/strings'], function (config, strings) {
         }
     };
 
+    /**
+     * Get the mouse position from a mouse event.
+     * 
+     * @param {MouseEvent} evt The mouse event from where to extract the position.
+     * @returns {Point} The mouse position.
+     */
     StageUI.prototype.getMousePos = function (evt) {
-        var rect = this.canvas.getBoundingClientRect();
-        return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
-        };
+        var rect = this.canvas.getBoundingClientRect(),
+            mousePos = new Point(evt.clientX - rect.left, evt.clientY - rect.top);
+
+        return mousePos;
     };
 
     StageUI.prototype.renderHelp = function (helpLines, rightMargin, topMargin, strokeStyle, fillStyle) {

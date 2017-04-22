@@ -28,8 +28,8 @@ define(['config/config', 'config/strings'], function (config, strings) {
          * A menu item.
          *
          * @typedef {object} menuitem
-         * @property {boolean} selected - Indicates whether the menu item is selected.
-         * @property {function} action - The action to run of the menu is used.
+         * @property {boolean} selected Indicates whether the menu item is selected.
+         * @property {function} action The action to run of the menu is used.
          */
 
         /**
@@ -170,8 +170,8 @@ define(['config/config', 'config/strings'], function (config, strings) {
                 self.setMenuItemSelectionStatus(menuItemKey, true);
             },
             menuItemMouseOut = function (menuItemKey) {},
-            hoverElementDrawFunction = function (hoverElement) {
-                self.drawMenuItem(hoverElement.identifier, hoverElement.renderXPos, hoverElement.renderYPos);
+            hoverableDrawFunction = function (hoverable) {
+                self.drawMenuItem(hoverable.identifier, hoverable.renderXPos, hoverable.renderYPos);
             };
 
         Object.keys(this.menuItems).forEach(function (menuItemKey) {
@@ -185,10 +185,10 @@ define(['config/config', 'config/strings'], function (config, strings) {
                     bottomRightY: menuPos.y + menuItemTop + config.GENERAL_TEXT_SHADOW_DIFF_Y
                 };
 
-            self.stage.addHoverElements(
+            self.stage.addHoverable(
                 menuItemKey,
                 menuItemBounds,
-                hoverElementDrawFunction,
+                hoverableDrawFunction,
                 self.stage.canvas.width / 2,
                 menuPos.y + menuItemTop,
                 menuItemMouseOver,

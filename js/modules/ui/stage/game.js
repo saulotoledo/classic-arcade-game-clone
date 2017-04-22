@@ -112,6 +112,8 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
 
             var key = allowedKeys[e.keyCode];
 
+            console.log(key);
+
             if (key === 'P' || key === 'p') {
                 self.togglePause();
             } else if (!self.game.isPaused && self.isValidMove(key)) {
@@ -144,8 +146,8 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
      */
     GameUI.prototype.isValidMove = function (key) {
         var playerLoc = {
-            row: this.player.y / config.GENERAL_TILE_HEIGHT - 1,
-            col: this.player.x / config.GENERAL_TILE_WIDTH
+            row: this.player.position.y / config.GENERAL_TILE_HEIGHT - 1,
+            col: this.player.position.x / config.GENERAL_TILE_WIDTH
         };
 
         switch (key) {
@@ -358,7 +360,7 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
      * Check if the player won the game.
      */
     GameUI.prototype.checkWinner = function () {
-        if (this.player.y < config.GAME_WIN_LIMIT_BOUNDARY) {
+        if (this.player.position.y < config.GAME_WIN_LIMIT_BOUNDARY) {
 
             this.game.audioControl.playSound('playerReachesWater');
 
@@ -435,10 +437,10 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
     GameUI.prototype.checkCollisions = function () {
         var self = this,
             _hasCollision = function (player, element) {
-                return player.x < (element.x + element.width) &&
-                    player.y < (element.y + element.height) &&
-                    element.x < (player.x + player.width) &&
-                    element.y < (player.y + player.height);
+                return player.position.x < (element.position.x + element.width) &&
+                    player.position.y < (element.position.y + element.height) &&
+                    element.position.x < (player.position.x + player.width) &&
+                    element.position.y < (player.position.y + player.height);
             };
 
         // Checking the collisions with enemies:

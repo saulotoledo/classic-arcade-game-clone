@@ -78,11 +78,6 @@ define(['config/config', 'config/strings'], function (config, strings) {
             this.stage.ctx.drawImage(Resources.get('images/heart.png'), i * miniWidth, 0, miniWidth, miniHeight);
         }
 
-        // Drawing the mute/unmute icon:
-        var soundImage = 'images/audio_unmuted.png';
-        if (this.stage.game.isMute) {
-            soundImage = 'images/audio_muted.png';
-        }
 
         var soundIconWidth = 29,
             soundIconHeight = 23,
@@ -94,21 +89,27 @@ define(['config/config', 'config/strings'], function (config, strings) {
                 bottomRightY: soundIconTopMargin + soundIconHeight
             };
 
-        this.stage.ctx.drawImage(Resources.get(soundImage), soundIconBounds.topLeftX, soundIconBounds.topLeftY, soundIconWidth, soundIconHeight);
-
         if (!this.soundIsPrepared) {
             /* Adding the hover event to mute/unmute the sound. The current action
              * to be used in the mouse down event is only available when the mouse
              * is over the mute/unmute icon.
              * */
-            this.stage.addHoverElements(
+            this.stage.addHoverable(
                 'sound',
                 soundIconBounds,
-                // We need to draw the image resized, but this is not supported here,
-                // so we draw the image in the update function and use an empty
-                // function here. This behavior needs refactoring.
-                // TODO: fix the behavior above.
-                function () {},
+                // We need to draw a resized image, but this is not directly supported
+                // and we need a custom function to do it:
+                function () {
+                    // Drawing the mute/unmute icon:
+                    var soundImage;
+                    if (self.stage.game.isMute) {
+                        soundImage = 'images/audio_muted.png';
+                    } else {
+                        soundImage = 'images/audio_unmuted.png';
+                    }
+
+                    self.stage.ctx.drawImage(Resources.get(soundImage), soundIconBounds.topLeftX, soundIconBounds.topLeftY, soundIconWidth, soundIconHeight);
+                },
                 soundIconBounds.topLeftX,
                 soundIconBounds.topLeftY,
                 function (key) {

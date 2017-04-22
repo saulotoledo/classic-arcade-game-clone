@@ -69,17 +69,17 @@ define(['config/config', 'model/element/character'], function (config, Character
     /**
      * Handle the keyboard input.
      *
-     * @param {string} key - The name of the key to handle.
+     * @param {string} key The name of the key to handle.
      */
     Player.prototype.handleInput = function (key) {
-        if (key === 'up' && this.y > config.GAME_TOP_BOUNDARY) {
-            this.y -= config.GENERAL_TILE_HEIGHT;
-        } else if (key === 'right' && this.x < config.GAME_RIGHT_BOUNDARY) {
-            this.x += config.GENERAL_TILE_WIDTH;
-        } else if (key === 'down' && this.y < config.GAME_BOTTOM_BOUNDARY) {
-            this.y += config.GENERAL_TILE_HEIGHT;
-        } else if (key === 'left' && this.x > config.GAME_LEFT_BOUNDARY) {
-            this.x -= config.GENERAL_TILE_WIDTH;
+        if (key === 'up' && this.position.y > config.GAME_TOP_BOUNDARY) {
+            this.position.y -= config.GENERAL_TILE_HEIGHT;
+        } else if (key === 'right' && this.position.x < config.GAME_RIGHT_BOUNDARY) {
+            this.position.x += config.GENERAL_TILE_WIDTH;
+        } else if (key === 'down' && this.position.y < config.GAME_BOTTOM_BOUNDARY) {
+            this.position.y += config.GENERAL_TILE_HEIGHT;
+        } else if (key === 'left' && this.position.x > config.GAME_LEFT_BOUNDARY) {
+            this.position.x -= config.GENERAL_TILE_WIDTH;
         }
     };
 

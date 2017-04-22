@@ -5,7 +5,7 @@
  * @module model/element/character
  * @see module:model/element
  */
-define(['model/element'], function (Element) {
+define(['misc/point', 'model/element'], function (Point, Element) {
 
     /**
      * Creates a Character.
@@ -21,16 +21,10 @@ define(['model/element'], function (Element) {
         Element.call(this, sprite, x, y);
 
         /**
-         * The character's initial X position. Used to
+         * The character's initial position. Used to
          * reset it when needed.
          */
-        this.initialX = x;
-
-        /**
-         * The character's initial Y position. Used to
-         * reset it when needed.
-         */
-        this.initialY = y;
+        this.initialPosition = new Point(x, y);
 
         // Resets this element's properties:
         this.reset();
@@ -43,8 +37,8 @@ define(['model/element'], function (Element) {
      * Reset the character's position.
      */
     Character.prototype.reset = function () {
-        this.x = this.initialX;
-        this.y = this.initialY;
+        this.position.x = this.initialPosition.x;
+        this.position.y = this.initialPosition.y;
     };
 
     return Character;

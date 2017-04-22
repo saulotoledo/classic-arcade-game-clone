@@ -122,7 +122,7 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
                 bottomRightY: yPos + config.GENERAL_TILE_HEIGHT * 2
             };
 
-            this.addHoverElements(
+            this.addHoverable(
                 i,
                 itemBounds,
                 this.playerImages[i],

@@ -4,7 +4,7 @@
  *
  * @module model/element
  */
-define(['config/config'], function (config) {
+define(['config/config', 'misc/point'], function (config, Point) {
 
     /**
      * Creates an Element.
@@ -23,14 +23,9 @@ define(['config/config'], function (config) {
         this.sprite = sprite;
 
         /**
-         * The elements's X position.
+         * The elements's position.
          */
-        this.x = x;
-
-        /**
-         * The elements's Y position.
-         */
-        this.y = y;
+        this.position = new Point(x, y);
 
         /**
          * The element's width.
@@ -52,7 +47,7 @@ define(['config/config'], function (config) {
      * Draw the element on the screen.
      */
     Element.prototype.render = function (ctx) {
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+        ctx.drawImage(Resources.get(this.sprite), this.position.x, this.position.y);
     };
 
     return Element;

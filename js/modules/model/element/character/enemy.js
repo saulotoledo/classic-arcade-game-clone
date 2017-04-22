@@ -35,24 +35,24 @@ define(['config/config', 'model/element/character'], function (config, Character
      * Resets the enemy's position and speed in the game.
      */
     Enemy.prototype.reset = function () {
-        this.x = Math.randomInt(config.ENEMY_MIN_STARTING_X, config.ENEMY_MAX_STARTING_X);
-        this.y = 60 + (config.GENERAL_TILE_HEIGHT * Math.randomInt(0, 2));
+        this.position.x = Math.randomInt(config.ENEMY_MIN_STARTING_X, config.ENEMY_MAX_STARTING_X);
+        this.position.y = 60 + (config.GENERAL_TILE_HEIGHT * Math.randomInt(0, 2));
         this.speed = Math.randomInt(config.ENEMY_MIN_SPEED, config.ENEMY_MAX_SPEED) * this.enemyLevel;
     };
 
     /**
      * Update the enemy's position.
      *
-     * @param {number} dt - A time delta between ticks.
+     * @param {number} dt A time delta between ticks.
      */
     Enemy.prototype.update = function (dt) {
         // Multiply the movement by the dt parameter,
         // ensuring that the game runs at the same speed for
         // all computers:
-        this.x += this.speed * dt;
+        this.position.x += this.speed * dt;
 
         // Resets the enemy position if he goes off the canvas:
-        if (this.x > config.GAME_RIGHT_BOUNDARY + 100) {
+        if (this.position.x > config.GAME_RIGHT_BOUNDARY + 100) {
             this.reset();
         }
     };
