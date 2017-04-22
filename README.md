@@ -13,11 +13,6 @@ This is a 2D frogger like game build on top of HTML canvas. In this game the pla
 ![Congratulations screen](./misc/congrats_screenshot.png)
 ![Credits screen](./misc/credits_screenshot.png)
 
-## What is missing in the current version
-
-- Finish documentation (mostly in UI modules);
-- JSDoc instructions.
-
 ## Libraries and development
 
 Although not necessary, this implementation uses [RequireJS](http://requirejs.org/) to improve code readability. [RequireJS](http://requirejs.org/) is an [AMD module loader](http://requirejs.org/docs/whyamd.html), and it helps to visualize the dependencies between the entities in our code. For the sake of simplicity, there is a [copy of version 2.3.3](js/libs/require.js) of the library in the repository. With the proper changes, the game can still run without it.
