@@ -38,27 +38,16 @@ define(['config/config', 'config/strings'], function (config, strings) {
          * runs it.
          *
          * @type {function}
+         * @private
          */
-        this.mouseUpListener = function () {
+        var _mouseUpListener = function () {
             if (self.stage.currentAction) {
                 self.stage.currentAction();
             }
         };
 
         // Registering the mouseup listener:
-        this.stage.canvas.addEventListener('mouseup', this.mouseUpListener);
-    };
-
-    /**
-     * Callback to run when the stage is closed.
-     * It removes the event listeners.
-     */
-    GameUIStatusBar.prototype.close = function () {
-        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            this.stage.canvas.removeEventListener('mouseup', this.mouseUpListener);
-        } else if (document.detachEvent) { // For IE 8 and earlier versions
-            this.stage.canvas.detachEvent("onmouseup", this.mouseUpListener);
-        }
+        this.stage.registerListener('mouseup', _mouseUpListener);
     };
 
     /**
@@ -107,12 +96,12 @@ define(['config/config', 'config/strings'], function (config, strings) {
                 },
                 soundIconBounds.topLeftX,
                 soundIconBounds.topLeftY,
-                function (key) {
+                function (itemkey) {
                     self.stage.currentAction = function () {
                         self.stage.toggleAudio();
                     };
                 },
-                function (key) {
+                function (itemkey) {
                     self.stage.currentAction = null;
                 }
             );

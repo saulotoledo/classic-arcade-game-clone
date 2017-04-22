@@ -53,8 +53,9 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
          * 
          * @param {KeyboardEvent} evt The keyboard event.
          * @type {function}
+         * @private
          */
-        this.keyUpEvent = function (evt) {
+        var _keyUpListener = function (evt) {
             if (evt.keyCode === 13) { // Enter
                 self.returnToTintro();
             }
@@ -66,14 +67,15 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
          * 
          * @param {MouseEvent} evt The mouse event.
          * @type {function}
+         * @private
          */
-        this.mouseDownListener = function () {
+        var _mouseDownListener = function () {
             self.returnToTintro();
         };
 
         // Registering the events:
-        document.addEventListener('keyup', this.keyUpEvent);
-        this.canvas.addEventListener('mousedown', this.mouseDownListener);
+        this.registerListener('keyup', _keyUpListener);
+        this.registerListener('mousedown', _mouseDownListener);
 
         // Drawing the basic stage:
         this.drawBasicStage();
@@ -119,23 +121,6 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
             config.GENERAL_RETURN_Y_POS,
             true
         );
-    };
-
-    /**
-     * Callback to run when the stage is closed.
-     * It removes the event listeners created by the constructor and calls 
-     * the parent constructor.
-     */
-    ReturnableUI.prototype.close = function () {
-        StageUI.prototype.close.call(this);
-
-        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            document.removeEventListener('keyup', this.keyUpEvent);
-            this.canvas.removeEventListener('mousedown', this.mouseDownListener);
-        } else if (document.detachEvent) { // For IE 8 and earlier versions
-            document.detachEvent("onkeyup", this.keyUpEvent);
-            this.canvas.detachEvent("onmousedown", this.mouseDownListener);
-        }
     };
 
     /**

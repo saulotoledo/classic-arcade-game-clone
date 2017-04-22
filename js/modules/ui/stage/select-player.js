@@ -45,14 +45,13 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
          * 
          * @param {KeyboardEvent} evt The keyboard event.
          * @type {function}
+         * @private
          */
-        this.keyUpEvent = function (evt) {
+        var _keyUpListener = function (evt) {
             var allowedKeys = {
                     13: 'enter',
                     37: 'left',
-                    39: 'right',
-                    77: 'M',
-                    109: 'm'
+                    39: 'right'
                 },
                 key = allowedKeys[evt.keyCode];
 
@@ -75,8 +74,6 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
                 }
             } else if (key === 'enter') {
                 self.startGame();
-            } else if (key === 'm' || key === 'M') {
-                self.toggleAudio();
             }
         };
 
@@ -86,16 +83,17 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
          * 
          * @param {MouseEvent} evt The mouse event.
          * @type {function}
+         * @private
          */
-        this.mouseUpListener = function () {
+        var _mouseUpListener = function () {
             if (self.mouseOverElements.length > 0) {
                 self.startGame();
             }
         };
 
         // Registering the events:
-        document.addEventListener('keyup', this.keyUpEvent);
-        this.canvas.addEventListener('mouseup', this.mouseUpListener);
+        this.registerListener('keyup', _keyUpListener);
+        this.registerListener('mouseup', _mouseUpListener);
 
         // Preparing the hoverables:
         this.prepareHoverables();
@@ -103,23 +101,6 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
 
     SelectPlayerUI.prototype = Object.create(StageUI.prototype);
     SelectPlayerUI.prototype.constructor = SelectPlayerUI;
-
-    /**
-     * Callback to run when the stage is closed.
-     * It removes the event listeners created by the constructor and calls 
-     * the parent constructor.
-     */
-    SelectPlayerUI.prototype.close = function () {
-        StageUI.prototype.close.call(this);
-
-        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            document.removeEventListener('keyup', this.keyUpEvent);
-            this.canvas.removeEventListener('mouseup', this.mouseUpListener);
-        } else if (document.detachEvent) { // For IE 8 and earlier versions
-            document.detachEvent("onkeyup", this.keyUpEvent);
-            this.canvas.detachEvent("onmouseup", this.mouseUpListener);
-        }
-    };
 
     /**
      * Prepare the hoverable elements.

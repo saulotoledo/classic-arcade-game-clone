@@ -4,14 +4,14 @@ This is a 2D frogger like game build on top of HTML canvas. In this game the pla
 
 ## Game Preview
 
+### **Play it online [here](https://saulotoledo.github.io/classic-arcade-game-clone/)!**
+
 ![Intro screen](./misc/intro_screenshot.png)
 ![Player selection screen](./misc/player_selection_screenshot.png)
 ![Game with a boy](./misc/game_boy_screenshot.png)
 ![Game paused with a girl](./misc/game_paused_girl_screenshot.png)
 ![Congratulations screen](./misc/congrats_screenshot.png)
 ![Credits screen](./misc/credits_screenshot.png)
-
-**This is a work in progress.** You can play the current version online in [this link](https://saulotoledo.github.io/classic-arcade-game-clone/). Come back soon to check the final version.
 
 ## What is missing in the current version
 
@@ -36,15 +36,16 @@ This game is fully implemented in client-side JavaScript, so you just need a bro
 
 ## Game Controls
 
+### Global commands
+- **M key**: Mute/unmute game.
+
 ### Intro page
 - **Mouse move or up/down arrow keys (&#8593; &#8595;)**: Select menu item;
 - **Mouse left click or Enter key**: Use menu item;
-- **M key**: Mute/unmute game.
 
 ### Select your player page
 - **Mouse move or left/right arrow keys (&#8592; &#8594;)**: Select character;
 - **Mouse left click or Enter key**: Choose character;
-- **M key**: Mute/unmute game.
 
 ### Game page
 - **Arrow keys (&#8592; &#8593; &#8594; &#8595;)**: Move the player;

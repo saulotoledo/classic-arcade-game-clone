@@ -38,6 +38,29 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
         this.game = game;
 
         /**
+         * Define a generic callback.
+         * 
+         * @callback eventCallbackType
+         * @param {Event} evt The event object.
+         */
+
+        /**
+         * Define an object that contains the data used to identify the mouse hover
+         * areas in the stage.
+         *
+         * @typedef {object} eventAssociation
+         * @property {string} event The event name.
+         * @property {eventCallbackType} listener The listener function.
+         */
+
+        /**
+         * An array of {@link eventAssociation} objects.
+         *
+         * @type {eventAssociation[]}
+         */
+        this.events = [];
+
+        /**
          * Define an object that contains the coordinates used to verify
          * collisions.
          *
@@ -114,10 +137,11 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
          * 
          * @param {MouseEvent} evt The mouse event.
          * @type {function}
+         * @private
          */
-        this.mouseMoveListener = function (evt) {
+        var _mouseMoveListener = function (evt) {
             var mousePos = self.getMousePos(evt);
-
+            //console.log(self);
             // Updating the mouse cursor on hover areas:
             if (self.mouseOverElements.length > 0) {
                 self.canvas.style.cursor = "pointer";
@@ -165,8 +189,9 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
          * 
          * @param {MouseEvent} evt The mouse event.
          * @type {function}
+         * @private
          */
-        this.mouseIsPressedListener = function (evt) {
+        var _mouseIsPressedListener = function (evt) {
             self.mouseIsPressed = true;
         };
 
@@ -176,8 +201,9 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
          * 
          * @param {MouseEvent} evt The mouse event.
          * @type {function}
+         * @private
          */
-        this.mouseIsNotPressedListener = function (evt) {
+        var _mouseIsNotPressedListener = function (evt) {
             self.mouseIsPressed = false;
         };
 
@@ -188,8 +214,9 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
          * 
          * @param {KeyboardEvent} evt The keyboard event.
          * @type {function}
+         * @private
          */
-        this.handleKeysListener = function (evt) {
+        var _handleKeysListener = function (evt) {
             var allowedKeys = {
                     13: 'enter',
                     77: 'M',
@@ -210,28 +237,85 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
          * 
          * @param {KeyboardEvent} evt The keyboard event.
          * @type {function}
+         * @private
          */
-        this.enterIsNotPressedListener = function (evt) {
+        var _enterIsNotPressedListener = function (evt) {
             if (evt.keyCode === 13) { //enter
                 self.enterIsPressed = false;
             }
         };
 
         // Registering the mousemove event:
-        this.canvas.addEventListener('mousemove', this.mouseMoveListener);
+        this.registerListener('mousemove', _mouseMoveListener);
 
         // Registering the mousedown event to identify when the mouse is pressed:
-        this.canvas.addEventListener('mousedown', this.mouseIsPressedListener);
+        this.registerListener('mousedown', _mouseIsPressedListener);
 
         // Registering the mousedown event to identify when the mouse is not pressed:
-        this.canvas.addEventListener('mouseup', this.mouseIsNotPressedListener);
+        this.registerListener('mouseup', _mouseIsNotPressedListener);
 
         // Registering the keydown event to identify when the supported keys and when
         // the enter key is pressed:
-        document.addEventListener('keydown', this.handleKeysListener);
+        this.registerListener('keydown', _handleKeysListener);
 
         // Registering the keydown event to identify when the enter key is not pressed:
-        document.addEventListener('keyup', this.enterIsNotPressedListener);
+        this.registerListener('keyup', _enterIsNotPressedListener);
+    };
+
+    /**
+     * Register an event listener. The listener parameter must be a valid function.
+     * 
+     * @param {string} event The event name.
+     * @param {function} listener The listener.
+     */
+    StageUI.prototype.registerListener = function (event, listener) {
+
+        if (typeof listener === 'function') {
+
+            var self = this,
+                destinyObject;
+
+            this.events.push({
+                event: event,
+                listener: listener
+            });
+
+            if (event.indexOf('key') > -1) {
+                destinyObject = document;
+            } else {
+                destinyObject = self.canvas;
+            }
+
+            destinyObject.addEventListener(event, listener);
+        }
+    };
+
+    /**
+     * Unregister all event listeners.
+     */
+    StageUI.prototype.unregisterAllListeners = function () {
+        var self = this,
+            destinyObject;
+
+        // Removing the listeners:
+        this.events.forEach(function (event) {
+            // Key events are attached to the document, while other events are attached
+            // to the canvas:
+            if (event.event.indexOf('key') > -1) {
+                destinyObject = document;
+            } else {
+                destinyObject = self.canvas;
+            }
+
+            if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
+                destinyObject.removeEventListener(event.event, event.listener);
+            } else if (document.detachEvent) { // For IE 8 and earlier versions
+                destinyObject.detachEvent('on' + event.event, event.listener);
+            }
+        });
+
+        // Cleaning up the events array:
+        this.events = [];
     };
 
     /**
@@ -249,20 +333,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
      */
     StageUI.prototype.close = function () {
         this.hoverables = [];
-
-        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            document.removeEventListener('keyup', this.enterIsNotPressedListener);
-            document.removeEventListener('keydown', this.handleKeysListener);
-            this.canvas.removeEventListener('mouseup', this.mouseIsNotPressedListener);
-            this.canvas.removeEventListener('mousedown', this.mouseIsPressedListener);
-            this.canvas.removeEventListener('mousemove', this.mouseMoveListener);
-        } else if (document.detachEvent) { // For IE 8 and earlier versions
-            document.detachEvent("onkeyup", this.enterIsNotPressedListener);
-            document.detachEvent("onkeydown", this.handleKeysListener);
-            this.canvas.detachEvent("onmmouseup", this.mouseIsNotPressedListener);
-            this.canvas.detachEvent("onmousedown", this.mouseIsPressedListener);
-            this.canvas.detachEvent("onmousemove", this.mouseMoveListener);
-        }
+        this.unregisterAllListeners();
     };
 
     /**

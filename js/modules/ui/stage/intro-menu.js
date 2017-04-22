@@ -70,8 +70,9 @@ define(['config/config', 'config/strings'], function (config, strings) {
          * 
          * @param {KeyboardEvent} evt The keyboard event.
          * @type {function}
+         * @private
          */
-        this.keyUpEvent = function (evt) {
+        var _keyUpListener = function (evt) {
             var allowedKeys = {
                     13: 'enter',
                     38: 'up',
@@ -116,16 +117,17 @@ define(['config/config', 'config/strings'], function (config, strings) {
          * 
          * @param {MouseEvent} evt The mouse event.
          * @type {function}
+         * @private
          */
-        this.mouseUpListener = function () {
+        var _mouseUpListener = function () {
             if (typeof self.currentAction == 'function' && self.stage.mouseOverElements.length > 0) {
                 self.runCurrentAction();
             }
         };
 
         // Registering the events:
-        document.addEventListener('keyup', this.keyUpEvent);
-        this.stage.canvas.addEventListener('mouseup', this.mouseUpListener);
+        this.stage.registerListener('keyup', _keyUpListener);
+        this.stage.registerListener('mouseup', _mouseUpListener);
 
         // Preparing the hover actions:
         this.prepareMenuHoverActions();
@@ -237,20 +239,6 @@ define(['config/config', 'config/strings'], function (config, strings) {
         if (this.currentAction) {
             this.stage.game.audioControl.playSound('selectionAccept');
             this.currentAction();
-        }
-    };
-
-    /**
-     * Callback to run when the stage is closed.
-     * It removes the event listeners created by the constructor.
-     */
-    IntroUIMenu.prototype.close = function () {
-        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            document.removeEventListener('keyup', this.keyUpEvent);
-            this.stage.canvas.removeEventListener('mouseup', this.mouseUpListener);
-        } else if (document.detachEvent) { // For IE 8 and earlier versions
-            document.detachEvent("onkeyup", this.keyUpEvent);
-            this.stage.canvas.detachEvent("onmouseup", this.mouseUpListener);
         }
     };
 

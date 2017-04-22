@@ -103,8 +103,9 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
          * presses and sends the keys to your Player.handleInput() method.
          * 
          * @type {function}
+         * @private
          */
-        this.keyUpEventListener = function (e) {
+        var _keyUpListener = function (e) {
             var allowedKeys = {
                 37: 'left',
                 38: 'up',
@@ -121,9 +122,10 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
             } else if (!self.game.isPaused && self.isValidMove(key)) {
                 self.player.handleInput(allowedKeys[e.keyCode]);
             }
-        }
+        };
 
-        document.addEventListener('keyup', this.keyUpEventListener);
+        // Registering the keyup listener:
+        this.registerListener('keyup', _keyUpListener);
 
         // An interval to ramdomly create collectibles.
         this.collectiblesCreatorInterval = setInterval(function () {
@@ -321,18 +323,9 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
     GameUI.prototype.close = function () {
         StageUI.prototype.close.call(this);
 
-        this.statusBar.close();
         this.game.audioControl.stopBackgroundMusic();
         this.game.audioControl.currentBackgroundMusic = null;
         clearInterval(this.collectiblesCreatorInterval);
-
-        if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
-            document.removeEventListener('keyup', this.keyUpEventListener);
-            this.canvas.removeEventListener('mousedown', this.mouseDownListener);
-        } else if (document.detachEvent) { // For IE 8 and earlier versions
-            document.detachEvent("onkeyup", this.keyUpEventListener);
-            this.canvas.detachEvent("onmousedown", this.mouseDownListener);
-        }
     };
 
     /**

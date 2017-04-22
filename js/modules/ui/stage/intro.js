@@ -65,13 +65,5 @@ define(['config/config', 'config/strings', 'ui/stage', 'ui/stage/intro-menu'], f
         StageUI.prototype.init.call(this);
     };
 
-    /**
-     * Callback to run when the stage is closed.
-     */
-    IntroUI.prototype.close = function () {
-        StageUI.prototype.close.call(this);
-        this.menu.close();
-    };
-
     return IntroUI;
 });
