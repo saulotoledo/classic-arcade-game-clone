@@ -88,7 +88,7 @@ define([], function () {
          * The width of game elements for collision detection.
          * @type {number}
          */
-        GAME_ELEMENT_WIDTH: 50,
+        GAME_ELEMENT_WIDTH: 75,
 
         /**
          * The height of game elements for collision detection.
