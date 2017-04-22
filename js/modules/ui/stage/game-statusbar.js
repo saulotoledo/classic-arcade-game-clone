@@ -61,10 +61,6 @@ define(['config/config', 'config/strings'], function (config, strings) {
         }
     };
 
-    GameUIStatusBar.prototype.close = function () {
-
-    };
-
     /**
      * Updates the status bar.
      */
@@ -77,7 +73,6 @@ define(['config/config', 'config/strings'], function (config, strings) {
         for (var i = 0; i < this.stage.player.lifes; i++) {
             this.stage.ctx.drawImage(Resources.get('images/heart.png'), i * miniWidth, 0, miniWidth, miniHeight);
         }
-
 
         var soundIconWidth = 29,
             soundIconHeight = 23,

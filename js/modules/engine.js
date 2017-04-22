@@ -1,4 +1,12 @@
-/* Engine.js
+/* 
+ */
+
+/**
+ * An adaptation of the original engine file from Udacity.
+ * The general code idea is maintained as is in the original source file:
+ *
+ * <pre>
+ * Engine.js
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
  * render methods on your player and enemy objects (defined in your app.js).
@@ -12,11 +20,18 @@
  * This engine is available globally via the Engine variable and it also makes
  * the canvas' context (ctx) object globally available to make writing app.js
  * a little simpler to work with.
+ *</pre>
+ *
+ * @module engine
  */
-
-
 define(['config/config', 'ui/preload', 'ui/stage/intro', 'ui/stage/returnable/credits', 'ui/stage/returnable/gamewon', 'ui/stage/returnable/gamelost', 'ui/stage/select-player', 'ui/stage/game', 'game'], function (config, PreloadUI, IntroUI, CreditsUI, GameWonUI, GameLostUI, SelectPlayerUI, GameUI, Game) {
 
+    /**
+     * Creates the engine object.
+     *
+     * @constructor
+     * @alias module:engine
+     */
     var Engine = function (global) {
         /* Predefine the variables we'll be using within this scope,
          * create the canvas element, grab the 2D context for that canvas
@@ -35,8 +50,11 @@ define(['config/config', 'ui/preload', 'ui/stage/intro', 'ui/stage/returnable/cr
         canvas.height = config.GENERAL_CANVAS_HEIGHT;
         doc.body.appendChild(canvas);
 
-        /* This function serves as the kickoff point for the game loop itself
+        /**
+         * This function serves as the kickoff point for the game loop itself
          * and handles properly calling the update and render methods.
+         *
+         * @private
          */
         function main() {
             /* Get our time delta information which is required if your game
@@ -105,9 +123,12 @@ define(['config/config', 'ui/preload', 'ui/stage/intro', 'ui/stage/returnable/cr
             win.requestAnimationFrame(main);
         }
 
-        /* This function does some initial setup that should only occur once,
+        /**
+         * This function does some initial setup that should only occur once,
          * particularly setting the lastTime variable that is required for the
          * game loop.
+         *
+         * @private
          */
         function init() {
             reset();
@@ -115,9 +136,12 @@ define(['config/config', 'ui/preload', 'ui/stage/intro', 'ui/stage/returnable/cr
             main();
         }
 
-        /* This function does nothing but it could have been a good place to
+        /**
+         * This function does nothing but it could have been a good place to
          * handle game reset states - maybe a new game menu or a game over screen
          * those sorts of things. It's only called once by the init() method.
+         *
+         * @private
          */
         function reset() {
             // noop

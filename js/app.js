@@ -35,7 +35,7 @@ requirejs(['engine'], function (Engine) {
     /**
      * Shuffles the current array.
      *
-     * @returns The current array.
+     * @returns {Array} The modified array.
      */
     Array.prototype.shuffle = function () {
         var currentIndex = this.length,
@@ -63,8 +63,10 @@ requirejs(['engine'], function (Engine) {
          * with a static value.
          *
          * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/fill
-         * @param {any} value 
-         * @returns 
+         * @param {any} value Value to fill an array.
+         * @param {number} [start=0] Start index, defaults to 0.
+         * @param {number} [end=this.length] End index, defaults to `this.length`.
+         * @returns {Array} The modified array.
          */
         Array.prototype.fill = function (value) {
 

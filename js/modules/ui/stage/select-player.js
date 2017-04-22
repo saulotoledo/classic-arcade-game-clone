@@ -2,7 +2,7 @@
  * A module to define the select player UI.
  *
  * @module ui/stage/select-player
- * @see module:ui/stage/returnable
+ * @see module:ui/stage
  */
 define(['config/config', 'config/strings', 'ui/stage'], function (config, strings, StageUI) {
 
@@ -20,7 +20,7 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         StageUI.call(this, canvas, ctx, game);
 
         /**
-         * The player images.
+         * The player avatars.
          * 
          * @type {Array}
          */
@@ -38,6 +38,14 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         this.selectedIndex = 0;
 
         var self = this;
+
+        /**
+         * A listener that should be used in the keyup event to handle the
+         * allowed keys.
+         * 
+         * @param {KeyboardEvent} evt The keyboard event.
+         * @type {function}
+         */
         this.keyUpEvent = function (evt) {
             var allowedKeys = {
                     13: 'enter',
@@ -47,7 +55,6 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
                     109: 'm'
                 },
                 key = allowedKeys[evt.keyCode];
-
 
             if (key === 'right' || key === 'left') {
 
@@ -73,22 +80,35 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
             }
         };
 
+        /**
+         * A listener that should be used in the mouseup event to handle the
+         * mouse actions.
+         * 
+         * @param {MouseEvent} evt The mouse event.
+         * @type {function}
+         */
         this.mouseUpListener = function () {
             if (self.mouseOverElements.length > 0) {
                 self.startGame();
             }
         };
 
+        // Registering the events:
         document.addEventListener('keyup', this.keyUpEvent);
-
         this.canvas.addEventListener('mouseup', this.mouseUpListener);
 
+        // Preparing the hoverables:
         this.prepareHoverables();
     };
 
     SelectPlayerUI.prototype = Object.create(StageUI.prototype);
     SelectPlayerUI.prototype.constructor = SelectPlayerUI;
 
+    /**
+     * Callback to run when the stage is closed.
+     * It removes the event listeners created by the constructor and calls 
+     * the parent constructor.
+     */
     SelectPlayerUI.prototype.close = function () {
         StageUI.prototype.close.call(this);
 
@@ -101,6 +121,9 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         }
     };
 
+    /**
+     * Prepare the hoverable elements.
+     */
     SelectPlayerUI.prototype.prepareHoverables = function () {
 
         var xPos = config.GENERAL_TILE_WIDTH,
@@ -110,7 +133,6 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
             },
             mouseOutCallback = function (itemIndex) {},
             self = this;
-
 
         for (var i = 0; i < this.playerImages.length; i++) {
             var totalXPos = (i + 1) * xPos;
@@ -134,6 +156,9 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
         }
     };
 
+    /**
+     * Start the game by setting the player image and changing to the game scene.
+     */
     SelectPlayerUI.prototype.startGame = function () {
         this.game.audioControl.playSound('selectionAccept');
         this.game.playerSprite = this.playerImages[this.selectedIndex];

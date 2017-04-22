@@ -30,7 +30,6 @@ define(['config/config', 'config/strings', 'ui/stage/returnable'], function (con
      * Initializes the UI.
      */
     GameLostUI.prototype.init = function () {
-
         this.drawDetachedText(
             strings.youLost,
             config.GENERAL_TITLE_FONT,

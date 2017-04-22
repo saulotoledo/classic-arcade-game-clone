@@ -22,8 +22,6 @@ define(['config/config', 'config/strings'], function (config, strings) {
          */
         this.stage = introStage;
 
-        var self = this;
-
         /**
          * A menu item.
          *
@@ -64,12 +62,15 @@ define(['config/config', 'config/strings'], function (config, strings) {
         // initializes the current selected menu item:
         this.setMenuItemSelectionStatus(Object.keys(this.menuItems)[0], true);
 
-        this.mouseUpListener = function () {
-            if (typeof self.currentAction == 'function' && self.stage.mouseOverElements.length > 0) {
-                self.runCurrentAction();
-            }
-        };
+        var self = this;
 
+        /**
+         * A listener that should be used in the keyup event to handle the
+         * allowed keys.
+         * 
+         * @param {KeyboardEvent} evt The keyboard event.
+         * @type {function}
+         */
         this.keyUpEvent = function (evt) {
             var allowedKeys = {
                     13: 'enter',
@@ -109,12 +110,32 @@ define(['config/config', 'config/strings'], function (config, strings) {
             }
         };
 
-        document.addEventListener('keyup', this.keyUpEvent);
+        /**
+         * A listener that should be used in the mouseup event to handle the
+         * mouse actions.
+         * 
+         * @param {MouseEvent} evt The mouse event.
+         * @type {function}
+         */
+        this.mouseUpListener = function () {
+            if (typeof self.currentAction == 'function' && self.stage.mouseOverElements.length > 0) {
+                self.runCurrentAction();
+            }
+        };
 
+        // Registering the events:
+        document.addEventListener('keyup', this.keyUpEvent);
         this.stage.canvas.addEventListener('mouseup', this.mouseUpListener);
+
+        // Preparing the hover actions:
         this.prepareMenuHoverActions();
     };
 
+    /**
+     * Return the menu graphical constraints.
+     * 
+     * @returns {object} The menu x, y, width and height properties.
+     */
     IntroUIMenu.prototype.getMenuPos = function () {
         var menuPos = {
             x: this.stage.canvas.width / 2 - config.INIT_SCREEN_MENU_WIDTH / 2,
@@ -126,6 +147,13 @@ define(['config/config', 'config/strings'], function (config, strings) {
         return menuPos;
     };
 
+    /**
+     * Draw a menu item.
+     * 
+     * @param {string} menuItemKey The menu item key.
+     * @param {number} x The x position for the menu item.
+     * @param {number} y The y position for the menu item.
+     */
     IntroUIMenu.prototype.drawMenuItem = function (menuItemKey, x, y) {
 
         var menuItem = this.menuItems[menuItemKey],
@@ -162,6 +190,9 @@ define(['config/config', 'config/strings'], function (config, strings) {
         );
     };
 
+    /**
+     * Prepare the hover actions by adding a hoverable element for each menu item.
+     */
     IntroUIMenu.prototype.prepareMenuHoverActions = function () {
         var self = this,
             menuPos = this.getMenuPos(),
@@ -199,11 +230,20 @@ define(['config/config', 'config/strings'], function (config, strings) {
         });
     };
 
+    /**
+     * Run the current menu action.
+     */
     IntroUIMenu.prototype.runCurrentAction = function () {
-        this.stage.game.audioControl.playSound('selectionAccept');
-        this.currentAction();
+        if (this.currentAction) {
+            this.stage.game.audioControl.playSound('selectionAccept');
+            this.currentAction();
+        }
     };
 
+    /**
+     * Callback to run when the stage is closed.
+     * It removes the event listeners created by the constructor.
+     */
     IntroUIMenu.prototype.close = function () {
         if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
             document.removeEventListener('keyup', this.keyUpEvent);
@@ -214,6 +254,12 @@ define(['config/config', 'config/strings'], function (config, strings) {
         }
     };
 
+    /**
+     * Set the selection status of a menu.
+     * 
+     * @param {string} menuItemKeyToSet The menu item key.
+     * @param {boolean} value The menu selection status.
+     */
     IntroUIMenu.prototype.setMenuItemSelectionStatus = function (menuItemKeyToSet, value) {
         var self = this,
             keys = Object.keys(self.menuItems);
@@ -235,6 +281,13 @@ define(['config/config', 'config/strings'], function (config, strings) {
         });
     };
 
+    /**
+     * Return the top position of the mext menu item considering the position of
+     * the previous item.
+     * 
+     * @param {number} previousMenuItemTop The previous menu item top position.
+     * @returns {number} The top position of the next menu item.
+     */
     IntroUIMenu.prototype.getNextMenuItemTop = function (previousMenuItemTop) {
         var menuItemTopMargin = 45,
             textHeight = config.INIT_SCREEN_MENU_ITEM_HEIGHT;
@@ -246,6 +299,9 @@ define(['config/config', 'config/strings'], function (config, strings) {
         return previousMenuItemTop + textHeight + menuItemTopMargin / 2;
     };
 
+    /**
+     * Updates the menu (except for the hoverable part, that is accomplished by the stage).
+     */
     IntroUIMenu.prototype.update = function () {
         var menuPos = this.getMenuPos();
         this.stage.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';

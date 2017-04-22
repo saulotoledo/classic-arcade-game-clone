@@ -266,7 +266,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
     };
 
     /**
-     * Toggle the audio stage.
+     * Toggle the audio state.
      */
     StageUI.prototype.toggleAudio = function () {
         this.game.isMute = !this.game.isMute;
@@ -323,7 +323,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
      * @param {string} fillStyle The fill style of the text in the canvas.
      * @param {number} posX The x position of the text in the canvas.
      * @param {number} posY The y position of the text in the canvas.
-     * @param {boolean} pressed Informs if the text is pressed, i.e. closer to the shadow.
+     * @param {boolean} [pressed=false] Informs if the text is pressed, i.e. closer to the shadow.
      */
     StageUI.prototype.drawDetachedText = function (text, font, textAlign, strokeStyle, fillStyle, posX, posY, pressed) {
 
@@ -334,6 +334,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
         var offsetX = 0,
             offsetY = 0;
 
+        // If the text is "pressed", apply a minor offset to give that impression:
         if (pressed) {
             offsetX = 1;
             offsetY = 2;
@@ -354,7 +355,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
     };
 
     /**
-     * Draw the background image defined in {@link StageUI#backgroundImage}.
+     * Draw the background image defined in {@link StageUI#backgroundImage} on the stage.
      */
     StageUI.prototype.drawBackground = function () {
         if (this.backgroundImage !== null) {
@@ -381,6 +382,15 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
         return mousePos;
     };
 
+    /**
+     * Render the help message aligned to the right side of the stage.
+     * 
+     * @param {string[]} helpLines An array of strings to be rendered.
+     * @param {number} [rightMargin=20] The right margin with respect to the stage.
+     * @param {number} [topMargin=80] The top margin with respect to the stage.
+     * @param {string} [strokeStyle=black] The *strokeStyle* used by the canvas to render the text.
+     * @param {string} [fillStyle=white] The *fillStyle* used by the canvas to render the text.
+     */
     StageUI.prototype.renderHelp = function (helpLines, rightMargin, topMargin, strokeStyle, fillStyle) {
         var line = 0,
             self = this;
