@@ -580,7 +580,7 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
     GameUI.prototype.init = function (dt) {
         // Clean the canvas (black color):
         this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = 'black';
         this.ctx.fill();
 
         // Update the game:

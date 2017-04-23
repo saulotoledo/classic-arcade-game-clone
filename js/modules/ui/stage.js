@@ -144,9 +144,9 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
             //console.log(self);
             // Updating the mouse cursor on hover areas:
             if (self.mouseOverElements.length > 0) {
-                self.canvas.style.cursor = "pointer";
+                self.canvas.style.cursor = 'pointer';
             } else {
-                self.canvas.style.cursor = "initial";
+                self.canvas.style.cursor = 'initial';
             }
 
             // Check if the mouse is in a hover area:

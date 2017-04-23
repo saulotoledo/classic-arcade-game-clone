@@ -152,7 +152,7 @@ define(['config/config', 'config/strings', 'ui/stage'], function (config, string
     SelectPlayerUI.prototype.init = function (dt) {
 
         this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = 'black';
         this.ctx.fill();
 
         this.drawDetachedText(

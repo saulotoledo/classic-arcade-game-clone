@@ -60,7 +60,7 @@ define(['config/config', 'config/strings'], function (config, strings) {
         // Cleaning the screen (with black color):
         this.ctx.beginPath();
         this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = 'black';
         this.ctx.fill();
         this.ctx.closePath();
 
@@ -71,13 +71,13 @@ define(['config/config', 'config/strings'], function (config, strings) {
             topPosY = this.canvas.height / 2 - loadBarHeight / 2;
 
         this.ctx.beginPath();
-        this.ctx.strokeStyle = "gold";
+        this.ctx.strokeStyle = 'gold';
         this.ctx.rect(topPosX, topPosY, loadBarWidth, loadBarHeight);
         this.ctx.stroke();
         this.ctx.closePath();
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = "yellow";
+        this.ctx.fillStyle = 'yellow';
         this.ctx.rect(topPosX, topPosY, this.currentLoad, loadBarHeight);
         this.ctx.fill();
         this.ctx.closePath();

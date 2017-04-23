@@ -193,7 +193,7 @@ define([], function () {
         GENERAL_RETURN_FONT: '25pt BadaBoomBB',
 
         /**
-         * The top position of the "return to intro"" text on the y axis.
+         * The top position of the "return to intro" text on the y axis.
          * @type {number}
          */
         GENERAL_RETURN_Y_POS: 545,
