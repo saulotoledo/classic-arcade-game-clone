@@ -30,8 +30,7 @@ define(['config/config', 'config/strings', 'ui/stage/returnable'], function (con
     CreditsUI.prototype.init = function () {
 
         var xPos = config.GENERAL_TILE_WIDTH,
-            yPos = 1.45 * config.GENERAL_TITLE_TOP_Y_POS,
-            self = this;
+            yPos = 1.45 * config.GENERAL_TITLE_TOP_Y_POS;
 
         strings.credits.forEach(function (creditsLine) {
             var textFont = config.CREDITS_SCREEN_TEXT_FONT,
@@ -44,19 +43,19 @@ define(['config/config', 'config/strings', 'ui/stage/returnable'], function (con
                 extraSpace = 15;
             }
 
-            self.drawDetachedText(
+            this.drawDetachedText(
                 creditsLine,
                 textFont,
                 'center',
                 '#262626',
                 textColor,
-                self.canvas.width / 2,
+                this.canvas.width / 2,
                 yPos + extraSpace,
                 true
             );
 
             yPos += 30 + extraSpace;
-        });
+        }, this);
     };
 
     return CreditsUI;

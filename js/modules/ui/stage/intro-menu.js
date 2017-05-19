@@ -198,7 +198,7 @@ define(['config/config', 'config/strings'], function (config, strings) {
     IntroUIMenu.prototype.prepareMenuHoverActions = function () {
         var self = this,
             menuPos = this.getMenuPos(),
-            menuItemTop = self.getNextMenuItemTop(),
+            menuItemTop = this.getNextMenuItemTop(),
             menuItemMouseOver = function (menuItemKey) {
                 self.setMenuItemSelectionStatus(menuItemKey, true);
             },
@@ -208,28 +208,28 @@ define(['config/config', 'config/strings'], function (config, strings) {
             };
 
         Object.keys(this.menuItems).forEach(function (menuItemKey) {
-            self.stage.ctx.font = config.INIT_SCREEN_MENU_FONT;
+            this.stage.ctx.font = config.INIT_SCREEN_MENU_FONT;
             var textValue = strings[menuItemKey],
-                textWidth = self.stage.ctx.measureText(textValue).width,
+                textWidth = this.stage.ctx.measureText(textValue).width,
                 menuItemBounds = {
-                    topLeftX: self.stage.canvas.width / 2 - textWidth / 2,
+                    topLeftX: this.stage.canvas.width / 2 - textWidth / 2,
                     topLeftY: menuPos.y + menuItemTop - config.INIT_SCREEN_MENU_ITEM_HEIGHT,
-                    bottomRightX: self.stage.canvas.width / 2 + textWidth / 2 + config.GENERAL_TEXT_SHADOW_DIFF_X,
+                    bottomRightX: this.stage.canvas.width / 2 + textWidth / 2 + config.GENERAL_TEXT_SHADOW_DIFF_X,
                     bottomRightY: menuPos.y + menuItemTop + config.GENERAL_TEXT_SHADOW_DIFF_Y
                 };
 
-            self.stage.addHoverable(
+            this.stage.addHoverable(
                 menuItemKey,
                 menuItemBounds,
                 hoverableDrawFunction,
-                self.stage.canvas.width / 2,
+                this.stage.canvas.width / 2,
                 menuPos.y + menuItemTop,
                 menuItemMouseOver,
                 menuItemMouseOut
             );
 
-            menuItemTop = self.getNextMenuItemTop(menuItemTop);
-        });
+            menuItemTop = this.getNextMenuItemTop(menuItemTop);
+        }, this);
     };
 
     /**
@@ -249,24 +249,21 @@ define(['config/config', 'config/strings'], function (config, strings) {
      * @param {boolean} value The menu selection status.
      */
     IntroUIMenu.prototype.setMenuItemSelectionStatus = function (menuItemKeyToSet, value) {
-        var self = this,
-            keys = Object.keys(self.menuItems);
-
-        keys.forEach(function (menuItemKey) {
+        Object.keys(this.menuItems).forEach(function (menuItemKey) {
 
             if (menuItemKey === menuItemKeyToSet) {
-                self.menuItems[menuItemKey].selected = value;
+                this.menuItems[menuItemKey].selected = value;
 
                 if (value === true) {
-                    self.currentAction = self.menuItems[menuItemKey].action;
+                    this.currentAction = this.menuItems[menuItemKey].action;
                 }
             } else {
                 // Only one item should be selected at a time:
                 if (value === true) {
-                    self.menuItems[menuItemKey].selected = false;
+                    this.menuItems[menuItemKey].selected = false;
                 }
             }
-        });
+        }, this);
     };
 
     /**

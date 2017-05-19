@@ -103,7 +103,7 @@ define(['config/config', 'config/strings'], function (config, strings) {
             this.ctx.font = font;
             this.ctx.fillStyle = 'black';
             this.ctx.fillText('.', 0, 0);
-        });
+        }, this);
 
         var self = this;
         var nextPageInterval = setInterval(function () {

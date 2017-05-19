@@ -411,20 +411,20 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
         if (this.levelIsReady) {
             this.collectibles.forEach(function (collectible) {
                 collectible.render(this.ctx);
-            });
+            }, this);
 
             this.player.render(this.ctx);
 
             this.rocks.forEach(function (rock) {
                 rock.render(this.ctx);
-            });
+            }, this);
 
             /* Loop through all of the objects within the allEnemies array and call
              * the render function you have defined.
              */
             this.allEnemies.forEach(function (enemy) {
                 enemy.render(this.ctx);
-            });
+            }, this);
         }
     };
 
@@ -432,21 +432,20 @@ define(['config/config', 'config/strings', 'model/element/character/player', 'mo
      * Check game collisions.
      */
     GameUI.prototype.checkCollisions = function () {
-        var self = this,
-            _hasCollision = function (player, element) {
-                return player.position.x < (element.position.x + element.width) &&
-                    player.position.y < (element.position.y + element.height) &&
-                    element.position.x < (player.position.x + player.width) &&
-                    element.position.y < (player.position.y + player.height);
-            };
+        var _hasCollision = function (player, element) {
+            return player.position.x < (element.position.x + element.width) &&
+                player.position.y < (element.position.y + element.height) &&
+                element.position.x < (player.position.x + player.width) &&
+                element.position.y < (player.position.y + player.height);
+        };
 
         // Checking the collisions with enemies:
         this.allEnemies.forEach(function (enemy) {
-            if (_hasCollision(self.player, enemy)) {
-                self.game.audioControl.playSound('playerLostLife');
-                self.player.hit();
+            if (_hasCollision(this.player, enemy)) {
+                this.game.audioControl.playSound('playerLostLife');
+                this.player.hit();
             }
-        });
+        }, this);
 
         // Checking the collisions with collectibles:
         for (var i = 0; i < this.collectibles.length; i++) {

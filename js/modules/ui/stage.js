@@ -294,8 +294,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
      * Unregister all event listeners.
      */
     StageUI.prototype.unregisterAllListeners = function () {
-        var self = this,
-            destinyObject;
+        var destinyObject;
 
         // Removing the listeners:
         this.events.forEach(function (event) {
@@ -304,7 +303,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
             if (event.event.indexOf('key') > -1) {
                 destinyObject = document;
             } else {
-                destinyObject = self.canvas;
+                destinyObject = this.canvas;
             }
 
             if (document.removeEventListener) { // For all major browsers, except IE 8 and earlier
@@ -312,7 +311,7 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
             } else if (document.detachEvent) { // For IE 8 and earlier versions
                 destinyObject.detachEvent('on' + event.event, event.listener);
             }
-        });
+        }, this);
 
         // Cleaning up the events array:
         this.events = [];
@@ -347,7 +346,6 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
      * Render the elements that can receive a mouse hover in the game.
      */
     StageUI.prototype.renderHoverables = function () {
-        var self = this;
         this.hoverables.forEach(function (element) {
             if (typeof element.content === 'function') {
                 // Some elements, such as text, need a number of particular settings
@@ -356,9 +354,9 @@ define(['config/config', 'config/strings', 'misc/point'], function (config, stri
                 element.content(element);
             } else {
                 // others are rendered as images in their original size:
-                self.ctx.drawImage(Resources.get(element.content), element.renderXPos, element.renderYPos);
+                this.ctx.drawImage(Resources.get(element.content), element.renderXPos, element.renderYPos);
             }
-        });
+        }, this);
     };
 
     /**
